@@ -758,6 +758,19 @@ public:
         return VlQueue<IData>{};
     }
 
+    // Map/transform operations
+    template <typename T_Func>
+    auto map(T_Func with_func) const {
+        using R = decltype(with_func(std::declval<IData>(), std::declval<T_Value>()));
+        VlQueue<R> out;
+        IData index = 0;
+        for (const auto& i : m_deque) {
+            out.push_back(with_func(index, i));
+            ++index;
+        }
+        return out;
+    }
+
     // Reduction operators
     VlQueue min() const {
         if (m_deque.empty()) return VlQueue{};
@@ -1092,6 +1105,15 @@ public:
             [=](const std::pair<T_Key, T_Value>& i) { return with_func(i.first, i.second); });
         if (it == m_map.rend()) return VlQueue<T_Key>{};
         return VlQueue<T_Key>::consV(it->first);
+    }
+
+    // Map/transform operations
+    template <typename T_Func>
+    auto map(T_Func with_func) const {
+        using R = decltype(with_func(std::declval<T_Key>(), std::declval<T_Value>()));
+        VlQueue<R> out;
+        for (const auto& i : m_map) { out.push_back(with_func(i.first, i.second)); }
+        return out;
     }
 
     // Reduction operators
@@ -1484,6 +1506,19 @@ public:
             if (with_func(i, m_storage[i])) return VlQueue<IData>::consV(i);
         }
         return VlQueue<T_Key>{};
+    }
+
+    // Map/transform operations
+    template <typename T_Func>
+    auto map(T_Func with_func) const {
+        using R = decltype(with_func(std::declval<IData>(), std::declval<T_Value>()));
+        VlQueue<R> out;
+        IData index = 0;
+        for (const auto& i : m_storage) {
+            out.push_back(with_func(index, i));
+            ++index;
+        }
+        return out;
     }
 
     // Reduction operators
